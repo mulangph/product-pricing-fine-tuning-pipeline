@@ -8,7 +8,7 @@ Fine Tuning a frontier model: GPT-4.1-nano
 ## 🔎 Overview
 The script automates the complete downstream adaptation workflow:Data Ingestion: Loads a specialized e-commerce dataset (items_lite) directly from the Hugging Face Hub.Data Engineering: Transforms raw Python objects into formatted JSONL (JSON Lines) conversation structures required by OpenAI.File Management: Validates and uploads training and validation files to OpenAI cloud storage.Job Orchestration: Initiates and monitors a supervised fine-tuning (SFT) job using gpt-4.1-nano.Inference & Evaluation: Deploys the newly minted custom weights to run real-time inference on unseen test items.
 
-
+> [!CAUTION]
 UPDATE: The code does not work for new accounts, because of this update from OpenAI:
 
 In May 2026, OpenAI announced the deprecation and wind-down of self-serve fine-tuning.The Block: New accounts or organizations that did not have an active history of fine-tuning prior to the announcement are strictly blocked from starting new training jobs (403 Permission Denied).The Final Date: Even for older, active accounts, all training functionality will completely shut off by January 6, 2027
