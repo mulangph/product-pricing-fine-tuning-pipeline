@@ -52,8 +52,11 @@ def get_weight(details):
     weight_str = details.get("Item Weight")
     if weight_str:
         parts = weight_str.split(" ")
-        amount = float(parts[0])
-        unit = parts[1].lower()
+        try:
+            amount = float(parts[0].replace(",", ""))
+            unit = parts[1].lower()
+        except (ValueError, IndexError):
+            return 0
         if unit == "pounds":
             return amount
         elif unit == "ounces":
@@ -64,7 +67,7 @@ def get_weight(details):
             return amount / 453592
         elif unit == "kilograms":
             return amount / 0.453592
-        elif unit == "hundredths" and parts[2].lower() == "pounds":
+        elif unit == "hundredths" and len(parts) > 2 and parts[2].lower() == "pounds":
             return amount / 100
     return 0
 
@@ -72,7 +75,7 @@ def get_weight(details):
 def parse(datapoint, category):
     try:
         price = float(datapoint["price"])
-    except ValueError:
+    except (ValueError, TypeError):
         return None
     if MIN_PRICE <= price <= MAX_PRICE:
         title = datapoint["title"]
