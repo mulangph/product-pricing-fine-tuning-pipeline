@@ -1,6 +1,7 @@
 import os
 import re
 import json
+import time
 from dotenv import load_dotenv
 from huggingface_hub import login
 from openai import OpenAI
@@ -65,7 +66,7 @@ with open("jsonl/fine_tune_validation.jsonl", "rb") as f:
 
 
 #====================== Fine-Tuning Part ======================#
-openai.fine_tuning.jobs.create(
+job = openai.fine_tuning.jobs.create(
     training_file=train_file.id,
     validation_file=validation_file.id,
     model=MODEL_NAME,
@@ -73,19 +74,22 @@ openai.fine_tuning.jobs.create(
     hyperparameters={"n_epochs": 1, "batch_size": 1},
     suffix="pricer"
 )
+job_id = job.id
+print(f"Started fine-tuning job {job_id}")
 
-openai.fine_tuning.jobs.list(limit=1)
+# The job takes several minutes; the model name is only set once it succeeds
+while job.status not in ("succeeded", "failed", "cancelled"):
+    time.sleep(30)
+    job = openai.fine_tuning.jobs.retrieve(job_id)
+    print(f"Job status: {job.status}")
 
-job_id = openai.fine_tuning.jobs.list(limit=1).data[0].id
-
-openai.fine_tuning.jobs.retrieve(job_id)
-
-openai.fine_tuning.jobs.list_events(fine_tuning_job_id=job_id, limit=10).data
+if job.status != "succeeded":
+    raise RuntimeError(f"Fine-tuning job {job_id} {job.status}: {job.error}")
 
 
 #====================== Test the fine tuned model ======================#
 
-fine_tuned_model_name = openai.fine_tuning.jobs.retrieve(job_id).fine_tuned_model
+fine_tuned_model_name = job.fine_tuned_model
 
 # The prompt
 def test_messages_for(item):
