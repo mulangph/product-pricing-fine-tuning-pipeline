@@ -68,7 +68,7 @@ class Batch:
 
     def send_file(self):
         batch_file = self.batches / self.filename
-        with batch_file.open("rb", encoding="utf-8") as f:
+        with batch_file.open("rb") as f:
             response = groq.files.create(file=f, purpose="batch")
         self.file_id = response.id
 
@@ -133,7 +133,7 @@ class Batch:
         items = cls.batches[0].items
         for batch in cls.batches:
             batch.items = None
-        with state.open("wb", encoding="utf-8") as f:
+        with state.open("wb") as f:
             pickle.dump(cls.batches, f)
         for batch in cls.batches:
             batch.items = items
@@ -141,7 +141,7 @@ class Batch:
 
     @classmethod
     def load(cls, items):
-        with state.open("rb", encoding="utf-8") as f:
+        with state.open("rb") as f:
             cls.batches = pickle.load(f)
         for batch in cls.batches:
             batch.items = items
