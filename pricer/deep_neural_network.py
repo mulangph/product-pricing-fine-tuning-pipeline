@@ -160,8 +160,9 @@ class DeepNeuralNetworkRunner:
     def save(self, path):
         torch.save(self.model.state_dict(), path)
 
-    def load(self, path, device="mps"):
-        self.model.load_state_dict(torch.load(path, map_location=device))
+    """If using Mac set the device to mps, if using Windows set the device to cuda or blank so it will use the device the runner already picked up"""
+    def load(self, path, device=None):
+        self.model.load_state_dict(torch.load(path, map_location=device or self.device))
         self.model.to(self.device)
 
     def inference(self, item):
